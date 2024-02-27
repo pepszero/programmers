@@ -1,23 +1,23 @@
 function solution(money) {
-  return Math.max(steal(money, true), steal(money, false));
+  return steal(money);
 }
 
-function steal(money, stealFirst) {
-  // cache[i][0]: i번째를 안 넣었을때 0~i까지 합중 최대, cache[i][1]:i번째를 넣었을때 0~i 합중 최대
-  const cache = Array.from(Array(money.length), () => [-1, -1]);
+function steal(money) {
+  // cache[0]: 짝수번째 집까지 진행한 최댓값, cache[1]: 홀수번째 집까지 진행한 최댓값
+  const cache = [0, money[1]]; // 첫번째집을 안 턴 경우, 0번째 집까지 진행 최댓값=0, 1번째집까지 진행 최댓값=money[1]
+  const cache2 = [money[0], money[0]]; // 첫번째집을 턴 경우. 0번째 집까지 진행 최댓값=money[0], 1번째 집까지 진행 최댓값=money[0]
+
+  for (let i = 2; i < money.length; i++) {
+    cache[i % 2] = Math.max(cache[i % 2] + money[i], cache[(i + 1) % 2]);
+  }
+
+  for (let i = 2; i < money.length - 1; i++) {
+    cache2[i % 2] = Math.max(cache2[i % 2] + money[i], cache2[(i + 1) % 2]);
+  }
+
   let result = -1;
-  cache[0][0] = stealFirst ? -1 : 0;
-  cache[0][1] = stealFirst ? money[0] : -1;
-
-  for (let i = 1; i < money.length; i++) {
-    cache[i][0] = Math.max(cache[i - 1][0], cache[i - 1][1]);
-    cache[i][1] = cache[i - 1][0] + money[i];
-  }
-
-  if (stealFirst) {
-    cache[money.length - 1][1] -= money[money.length - 1];
-  }
-
-  result = Math.max(...cache[money.length - 1]);
+  result = Math.max(cache[0], cache[1]);
+  result = Math.max(result, cache2[0]);
+  result = Math.max(result, cache2[1]);
   return result;
 }
