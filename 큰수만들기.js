@@ -4,24 +4,35 @@ function solution(number, k) {
   return answer.toString();
 }
 
+// num에서 가장 큰 숫자의 인덱스 반환
+function findMaxIdx(num) {
+  const nums = ["9", "8", "7", "6", "5", "4", "3", "2", "1", "0"];
+  return nums.reduce((p, c) => (p !== -1 ? p : num.indexOf(c)), -1);
+}
+
 function removeNum(number, k) {
-  if (k === number.length) {
-    return "";
-  }
+  let num = number;
+  let head = "";
+  let tail = "";
 
-  const MAX = Math.max(...number);
-  const idx = number.indexOf(MAX);
-
-  if (idx === 0) {
-    // 맨 앞에 제일 큰수면: 제일 큰수를 답에 포함
-    return number[0] + removeNum(number.slice(1), k);
+  while (k < num.length) {
+    const idx = findMaxIdx(num);
+    if (idx === -1) break;
+    if (idx === 0) {
+      head += num[0];
+      num = num.slice(1);
+      continue;
+    }
+    if (idx <= k) {
+      num = num.slice(idx);
+      k -= idx;
+      continue;
+    }
+    if (idx > k) {
+      tail = num.slice(idx) + tail;
+      num = num.slice(0, idx);
+      continue;
+    }
   }
-  if (idx <= k) {
-    // 제일 큰수가 맨 앞으로 오도록 자름
-    return removeNum(number.slice(idx), k - idx);
-  }
-  if (idx > k) {
-    // 제일 큰수~끝까지는 유지
-    return removeNum(number.slice(0, idx), k) + number.slice(idx);
-  }
+  return head + tail;
 }
